@@ -19,7 +19,7 @@ def bitsToWave(bits, Fs=44100, baud=10):
 def FSKMod(bitwave, Fs = 44100, f0 = 1500.0, df = 500.0):
     time_end = len(bitwave)/Fs
     t = np.linspace(0.0, time_end, len(bitwave))
-    fsk = np.sin(2.0*np.pi*(f0*t + df*bitwave*t))
+    fsk = np.sin(2.0*np.pi*(f0 + df*bitwave)*t)
     return [t, fsk]
 
 bits = randomBitArray(10)
