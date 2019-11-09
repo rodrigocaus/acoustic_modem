@@ -7,6 +7,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+def stringToBits(string: str)->np.array:
+    narray = np.array(list(map(ord,string)),dtype="uint8") # Transforma a string num array de uint8
+    return np.unpackbits(narray) # converte todos os bytes em bits (array de 1's e 0's)
+
 def randomBitArray(n):
     return np.random.randint(0,2,n)
 
