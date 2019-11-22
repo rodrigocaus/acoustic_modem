@@ -7,25 +7,38 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
+from scipy.io import wavfile
 
-b, a = signal.butter(5, [800, 1600], btype='band', analog=True)
-w, h = signal.freqs(b, a)
-b, a = signal.butter(7, [800, 1600], btype='band', analog=True)
-w2, h2 = signal.freqs(b, a)
-b, a = signal.butter(9, [800, 1600], btype='band', analog=True)
-w3, h3 = signal.freqs(b, a)
 
-plt.semilogx(w, 20 * np.log10(abs(h)), label='ordem 5')
-plt.semilogx(w2, 20 * np.log10(abs(h2)), label='ordem 7')
-plt.semilogx(w3, 20 * np.log10(abs(h3)), label='ordem 9', color='red')
+def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0):
+    low_freq = f0 - df
+    high_freq = f0 + df
+    # Criacao dos filtros de Butterworth (passa faixa em high\low_freq +\- 100Hz)
+    filter_order = 5
+    dev = 100
+    num_low, den_low = signal.butter(filter_order, [(low_freq - dev), (low_freq + dev)], btype='band', fs=Fs)
+    num_high, den_high = signal.butter(filter_order, [(high_freq - dev), (high_freq + dev)], btype='band', fs=Fs)
+    # Filtragem da entrada
+    low_wave = signal.lfilter(num_low, den_low, wave)
+    high_wave = signal.lfilter(num_high, den_high, wave)
+    # Deteccao de envelope
+    low_wave = low_wave**2.0
+    high_wave = high_wave**2.0
+    # Subtracao dos sinais para comparacao
+    return high_wave - low_wave
 
-plt.xlabel('Frequência (Hz)')
-plt.ylabel('Amplitude (dB)')
-plt.grid(which='both', axis='both')
-plt.axvline(800, color='green', linestyle='--', linewidth='1') # cutoff frequency
-plt.axvline(1600, color='green', linestyle='--', linewidth='1') # cutoff frequency
-plt.xlim((100, 10000))
-plt.ylim((-100,10))
 
-plt.legend()
+def bitwaveSample(bitwave, Fs=44100, baud=10):
+    return 0
+
+
+def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM'):
+    return 0
+
+fs, audio = wavfile.read('hello.wav')
+audio = np.float64(audio/(2**31 - 1))
+level = FSKdemod(audio, Fs=fs)
+
+plt.plot(level)
+plt.xlim(604000, 605000)
 plt.show()
