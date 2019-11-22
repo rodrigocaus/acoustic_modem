@@ -1,19 +1,31 @@
 '''
     Script for FSK modulation
-        Frequêncy modulation based on digital or binary information
+        Frequency modulation based on digital or binary information
 
 '''
 
 import numpy as np
 import matplotlib.pyplot as plt
 import sounddevice as sd
+from scipy.io import wavfile
 
-def stringToBits(string: str)->np.array:
-    narray = np.array(list(map(ord,string)),dtype="uint8") # Transforma a string num array de uint8
-    return np.unpackbits(narray) # converte todos os bytes em bits (array de 1's e 0's)
+def stringToBits(string: str) -> np.array:
+    # Transforma a string num array de uint8
+    narray = np.array(list(map(ord, string)), dtype="uint8")
+    # converte todos os bytes em bits (array de 1's e 0's)
+    return np.unpackbits(narray)
+
+
+def bitsToString(bits: np.array) -> str:
+    # Transforma o array de bits em um array de uint8
+    packed = np.packbits(bits)
+    # Converte o array de uint8 em caracteres e concatena em uma string
+    return str("".join(map(chr, packed)))
+
 
 def randomBitArray(n):
-    return np.random.randint(0,2,n)
+    return np.random.randint(0, 2, n)
+
 
 def bitsToWave(bits, Fs=44100, baud=10):
     sample_bit = int(Fs/baud)
@@ -21,24 +33,33 @@ def bitsToWave(bits, Fs=44100, baud=10):
     wave = 2.0 * wave - 1.0
     return wave
 
-def FSKMod(bitwave, Fs = 44100, f0 = 1500.0, df = 500.0):
+
+def FSKMod(bitwave, Fs=44100, f0=1500.0, df=500.0):
     time_end = len(bitwave)/Fs
     t = np.linspace(0.0, time_end, len(bitwave))
     fsk = np.sin(2.0*np.pi*(f0 + df*bitwave)*t)
-    print(t)
     return [t, fsk]
 
-def playSound(t, fsk):
-    sd.play(t, 44100)
 
-def sincronizeMessage(s: str, INIT_STREAM_CHAR=240, END_STREAM_CHAR=241) -> str:
+def playSound(t, Fs=44100):
+    sd.play(t, Fs)
+
+
+def sincronizeMessage(s: str, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM') -> str:
     # coloca um caractere de inicio e de final na string
-    return chr(INIT_STREAM_CHAR) + s + chr(END_STREAM_CHAR)
+    return str(INIT_STREAM) + s + str(END_STREAM)
+
 
 bits = stringToBits(sincronizeMessage("Hello World!"))
 mb = bitsToWave(bits)
-t, x = FSKMod(mb)#, f0=30.0, df=10.0)
-playSound(x, 44100)
+t, x = FSKMod(mb)
+
+playSound(x)
+# Espera o som acabar para continuar o script
+#sd.wait()
+
+wavfile.write('hello.wav', 44100, np.int32( (2**31 - 1) * x))
+
 ## Plotting Data ##
 ax_bit = plt.subplot(211)
 ax_bit.plot(t, mb)
