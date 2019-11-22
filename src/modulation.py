@@ -31,9 +31,11 @@ def FSKMod(bitwave, Fs = 44100, f0 = 1500.0, df = 500.0):
 def playSound(t, fsk):
     sd.play(t, 44100)
 
-INIT_CHAR = 240 # char de sincronização 
+def sincronizeMessage(s: str, INIT_STREAM_CHAR=240, END_STREAM_CHAR=241) -> str:
+    # coloca um caractere de inicio e de final na string
+    return chr(INIT_STREAM_CHAR) + s + chr(END_STREAM_CHAR)
 
-bits = stringToBits(chr(INIT_CHAR)+"Hello World!")
+bits = stringToBits(sincronizeMessage("Hello World!"))
 mb = bitsToWave(bits)
 t, x = FSKMod(mb)#, f0=30.0, df=10.0)
 playSound(x, 44100)
