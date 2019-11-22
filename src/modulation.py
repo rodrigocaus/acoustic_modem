@@ -6,6 +6,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import sounddevice as sd
 
 def stringToBits(string: str)->np.array:
     narray = np.array(list(map(ord,string)),dtype="uint8") # Transforma a string num array de uint8
@@ -24,12 +25,18 @@ def FSKMod(bitwave, Fs = 44100, f0 = 1500.0, df = 500.0):
     time_end = len(bitwave)/Fs
     t = np.linspace(0.0, time_end, len(bitwave))
     fsk = np.sin(2.0*np.pi*(f0 + df*bitwave)*t)
+    print(t)
     return [t, fsk]
 
-bits = randomBitArray(10)
-mb = bitsToWave(bits)
-t, x = FSKMod(mb, f0=30.0, df=10.0)
+def playSound(t, fsk):
+    sd.play(t, 44100)
 
+INIT_CHAR = 240 # char de sincronização 
+
+bits = stringToBits(chr(INIT_CHAR)+"Hello World!")
+mb = bitsToWave(bits)
+t, x = FSKMod(mb)#, f0=30.0, df=10.0)
+playSound(x, 44100)
 ## Plotting Data ##
 ax_bit = plt.subplot(211)
 ax_bit.plot(t, mb)
