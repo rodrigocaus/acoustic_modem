@@ -1,2 +1,2 @@
 *.wav
-
+src/__pycache__/*
