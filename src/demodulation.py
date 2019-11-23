@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from scipy import signal
 from scipy.io import wavfile
 
+from modulation import stringToBits, bitsToString, bitsToWave
+
 
 def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0):
     low_freq = f0 - df
@@ -31,23 +33,35 @@ def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0):
     bitwave = high_wave/max(high_wave) - low_wave/max(low_wave)
     bitwave[bitwave > 0.0] = 1.0
     bitwave[bitwave <= 0.0] = 0.0
-
+    # Retorna uma bitwave de 0's e 1's
     return bitwave
 
 
 def bitwaveSample(bitwave, Fs=44100, baud=10):
-    return 0
+    sample_bit = int(Fs/baud)
+
+    # Subamostra dez amostras e faz a media
+    bits = np.zeros((int(len(bitwave)/sample_bit), ), dtype=np.int32)
+    for i in range(len(bits)):
+        center = int((2*i+1)*(sample_bit/2))
+        dev = 5
+        bits[i] = np.rint(np.mean(bitwave[center-dev:center+dev]))
+
+    return bits
 
 
 def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM'):
     return 0
 
 
-fs, audio = wavfile.read('hello.wav')
-audio = np.float64(audio/(2**31 - 1))
-bitwave = FSKdemod(audio, Fs=fs)
+if __name__ == '__main__':
 
-plt.figure()
-plt.plot(bitwave)
-plt.xlim(420000, 470000)
-plt.show()
+    fs, audio = wavfile.read('hello.wav')
+    audio = np.float64(audio/(2**31 - 1))
+    bitwave = FSKdemod(audio, Fs=fs)
+    bits = bitwaveSample(bitwave)
+    print(bitsToString(bits))
+    plt.figure()
+    plt.plot(bitwave)
+    plt.xlim(420000, 470000)
+    plt.show()
