@@ -20,14 +20,19 @@ def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0):
         low_freq - dev), (low_freq + dev)], btype='band', fs=Fs, output='sos')
     sos_high = signal.butter(filter_order, [(
         high_freq - dev), (high_freq + dev)], btype='band', fs=Fs, output='sos')
+
     # Filtragem da entrada
     low_wave = signal.sosfilt(sos_low, wave)
     high_wave = signal.sosfilt(sos_high, wave)
     # Deteccao de envelope
-    low_wave = low_wave**2.0
-    high_wave = high_wave**2.0
+    low_wave = np.abs(signal.hilbert(low_wave))
+    high_wave = np.abs(signal.hilbert(high_wave))
     # Subtracao dos sinais para comparacao
-    return high_wave - low_wave
+    bitwave = high_wave/max(high_wave) - low_wave/max(low_wave)
+    bitwave[bitwave > 0.0] = 1.0
+    bitwave[bitwave <= 0.0] = 0.0
+
+    return bitwave
 
 
 def bitwaveSample(bitwave, Fs=44100, baud=10):
@@ -40,8 +45,9 @@ def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09V
 
 fs, audio = wavfile.read('hello.wav')
 audio = np.float64(audio/(2**31 - 1))
-level = FSKdemod(audio, Fs=fs)
+bitwave = FSKdemod(audio, Fs=fs)
 
-plt.plot(level)
-plt.xlim(604000, 605000)
+plt.figure()
+plt.plot(bitwave)
+plt.xlim(420000, 470000)
 plt.show()
