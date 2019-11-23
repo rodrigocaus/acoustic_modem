@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import sounddevice as sd
 from scipy.io import wavfile
 
+
 def stringToBits(string: str) -> np.array:
     # Transforma a string num array de uint8
     narray = np.array(list(map(ord, string)), dtype="uint8")
@@ -50,26 +51,28 @@ def sincronizeMessage(s: str, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZM
     return str(INIT_STREAM) + s + str(END_STREAM)
 
 
-bits = stringToBits(sincronizeMessage("Hello World!"))
-mb = bitsToWave(bits)
-t, x = FSKMod(mb)
+if __name__ == '__main__':
 
-playSound(x)
-# Espera o som acabar para continuar o script
-#sd.wait()
+    bits = stringToBits(sincronizeMessage("Hello World!"))
+    mb = bitsToWave(bits)
+    t, x = FSKMod(mb)
 
-wavfile.write('hello.wav', 44100, np.int32( (2**31 - 1) * x))
+    playSound(x)
+    # Espera o som acabar para continuar o script
+    # sd.wait()
 
-## Plotting Data ##
-ax_bit = plt.subplot(211)
-ax_bit.plot(t, mb)
-ax_bit.set_ylabel('Mensagem binária')
-ax_bit.grid(True)
+    wavfile.write('hello.wav', 44100, np.int32((2**31 - 1) * x))
 
-ax_mod = plt.subplot(212)
-ax_mod.plot(t, x)
-ax_mod.set_ylabel('Mensagem modulada')
-ax_mod.set_xlabel('Tempo (s)')
-ax_mod.grid(True)
+    ## Plotting Data ##
+    ax_bit = plt.subplot(211)
+    ax_bit.plot(t, mb)
+    ax_bit.set_ylabel('Mensagem binária')
+    ax_bit.grid(True)
 
-plt.show()
+    ax_mod = plt.subplot(212)
+    ax_mod.plot(t, x)
+    ax_mod.set_ylabel('Mensagem modulada')
+    ax_mod.set_xlabel('Tempo (s)')
+    ax_mod.grid(True)
+
+    plt.show()
