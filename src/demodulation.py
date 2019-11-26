@@ -4,6 +4,7 @@
 
 '''
 
+import sounddevice as sd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
@@ -11,6 +12,16 @@ from scipy.io import wavfile
 
 from modulation import stringToBits, bitsToString, bitsToWave
 
+
+sd.default.samplerate = 44100
+sd.default.channels = 1
+
+def getAudio(duration=15, fs = 44100):
+    print("Start recording..")
+    audio = sd.rec(int(duration * fs))
+    sd.wait() # espera a gravação ser finalizada
+    print("Record ended")
+    return audio
 
 def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0):
     low_freq = f0 - df
@@ -50,18 +61,41 @@ def bitwaveSample(bitwave, Fs=44100, baud=10):
     return bits
 
 
-def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM'):
-    return 0
+def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM', Fs=44100, baud=10):
+    #sample=int(Fs/baud)
+    #sync_init = bitsToWave(stringToBits(INIT_STREAM))
+    #sync_end = bitsToWave(stringToBits(END_STREAM))
+    #c_init = np.correlate(bits[:int(len(bits)/2)], sync_init)
+    #c_end =  np.correlate(bits[int(len(bits)/2):], sync_end)
+    #begin = np.where(c_init == np.amax(c_init))[0][0]+len(sync_init)
+    #end = np.where(c_end == np.amax(c_end))[0][0]+int(len(bits)/2)
+    #sync_bits = bits[begin:end+ int((8 - ((end-begin)/sample)%8)*sample)]
+    #return sync_bits
+    sync_init = stringToBits(INIT_STREAM)
+    sync_end = stringToBits(END_STREAM)
+    c_init = np.correlate(bits, sync_init)
+    c_end = np.correlate(bits, sync_end)
+    begin = np.where(c_init == np.amax(c_init))[0][0]+len(sync_init)
+    end = np.where(c_end == np.amax(c_end))[0][0]
+    plt.plot(c_init)
+    plt.show()
+    plt.plot(c_end)
+    plt.show()
+
+    return bits[begin: end]
 
 
 if __name__ == '__main__':
-
-    fs, audio = wavfile.read('hello.wav')
+    #fs, audio = wavfile.read('hello.wav')
+    fs = 44100
+    audio = getAudio(duration=200)[:,0]
     audio = np.float64(audio/(2**31 - 1))
     bitwave = FSKdemod(audio, Fs=fs)
     bits = bitwaveSample(bitwave)
+    bits = sincronizeBits(bits)
     print(bitsToString(bits))
     plt.figure()
     plt.plot(bitwave)
     plt.xlim(420000, 470000)
     plt.show()
+

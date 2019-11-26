@@ -53,13 +53,19 @@ def sincronizeMessage(s: str, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZM
 
 if __name__ == '__main__':
 
-    bits = stringToBits(sincronizeMessage("Hello World!"))
+    bits = stringToBits(sincronizeMessage("""When I'm sad, she comes to me
+With a thousand smiles she gives to me free
+It's alright, she said, it's alright
+Take anything you want from me
+Anything, anything
+Fly on, little wing
+"""))
     mb = bitsToWave(bits)
     t, x = FSKMod(mb)
 
     playSound(x)
     # Espera o som acabar para continuar o script
-    # sd.wait()
+    sd.wait()
 
     wavfile.write('hello.wav', 44100, np.int32((2**31 - 1) * x))
 
