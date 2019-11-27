@@ -78,12 +78,17 @@ def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09V
 
 if __name__ == '__main__':
     fs = 44100
-    audio = getAudio(duration=200)[:,0]
+#    audio = getAudio(duration=230)[:,0]
+    fs, audio = wavfile.read('hello.wav')
     audio = np.float64(audio/(2**31 - 1))
     bitwave = FSKdemod(audio, Fs=fs)
     bits = bitwaveSample(bitwave)
     bits = sincronizeBits(bits)
-    print(bitsToString(bits))
+
+    out_bits = np.array(bits)
+    out_bytes = np.packbits(out_bits)
+    out_bytes.tofile('haha.png')
+
     plt.figure()
     plt.plot(bitwave)
     plt.xlim(420000, 470000)

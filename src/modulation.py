@@ -52,6 +52,13 @@ def sincronizeMessage(s: str, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZM
 
 
 if __name__ == '__main__':
+    in_name = 'lixo.png'
+    in_bytes = np.fromfile(in_name, dtype = "uint8")
+    in_bits = np.unpackbits(in_bytes)
+    print(in_bits)
+    
+    INIT_STRING = stringToBits("2wLQTcNgiXyP<{")
+    END_STRING = stringToBits('}>ggIVZMbi09VM')
 
     bits = stringToBits(sincronizeMessage("""When I'm sad, she comes to me
 With a thousand smiles she gives to me free
@@ -60,6 +67,8 @@ Take anything you want from me
 Anything, anything
 Fly on, little wing
 """))
+    bits = np.concatenate([INIT_STRING, in_bits, END_STRING])
+    print(bits)
     mb = bitsToWave(bits)
     t, x = FSKMod(mb)
 
