@@ -75,16 +75,7 @@ def bitwaveSample(bitwave, Fs=44100, baud=10):
     return bits
 
 
-def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM', Fs=44100, baud=10, verbose=False):
-    # sample=int(Fs/baud)
-    #sync_init = bitsToWave(stringToBits(INIT_STREAM))
-    #sync_end = bitsToWave(stringToBits(END_STREAM))
-    #c_init = np.correlate(bits[:int(len(bits)/2)], sync_init)
-    #c_end =  np.correlate(bits[int(len(bits)/2):], sync_end)
-    #begin = np.where(c_init == np.amax(c_init))[0][0]+len(sync_init)
-    #end = np.where(c_end == np.amax(c_end))[0][0]+int(len(bits)/2)
-    #sync_bits = bits[begin:end+ int((8 - ((end-begin)/sample)%8)*sample)]
-    # return sync_bits
+def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM', Fs=44100, baud=10):
     sync_init = stringToBits(INIT_STREAM)
     sync_end = stringToBits(END_STREAM)
     c_init = np.correlate(bits, sync_init)
@@ -108,8 +99,6 @@ def bitErrorRate(original_bits: np.array, received_bits: np.array):
 
 
 if __name__ == '__main__':
-
-    #fs, audio = wavfile.read('hello.wav')
     fs = 44100
     audio = getAudio(duration=200)[:,0]
     audio = np.float64(audio/(2**31 - 1))
