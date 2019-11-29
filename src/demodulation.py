@@ -40,7 +40,6 @@ def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0, verbose=False):
     low_wave = signal.sosfilt(sos_low, wave)
     high_wave = signal.sosfilt(sos_high, wave)
     if verbose:
-        plt.figure()
         plt.subplot(211)
         plt.plot(low_wave)
         plt.subplot(212)
@@ -49,7 +48,6 @@ def FSKdemod(wave, Fs=44100, f0=1400.0, df=500.0, verbose=False):
     low_wave = np.abs(signal.hilbert(low_wave))
     high_wave = np.abs(signal.hilbert(high_wave))
     if verbose:
-        plt.figure()
         plt.subplot(211)
         plt.plot(low_wave)
         plt.subplot(212)
@@ -83,7 +81,6 @@ def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09V
     begin = np.where(c_init == np.amax(c_init))[0][0]+len(sync_init)
     end = np.where(c_end == np.amax(c_end))[0][0]
     if verbose:
-        plt.figure()
         plt.subplot(211)
         plt.plot(c_init)
         plt.subplot(212)
