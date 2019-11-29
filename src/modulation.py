@@ -53,32 +53,27 @@ def sincronizeMessage(s: str, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZM
 
 if __name__ == '__main__':
 
-    bits = stringToBits(sincronizeMessage("""When I'm sad, she comes to me
-With a thousand smiles she gives to me free
-It's alright, she said, it's alright
-Take anything you want from me
-Anything, anything
-Fly on, little wing
-"""))
-    mb = bitsToWave(bits)
+    bits = stringToBits(sincronizeMessage("LJlqRK0sLItJH3dzgpoYb0g79fXs7u2dr67lxY2GYhTiiwyH7y"))
+    mb = bitsToWave(bits,baud=25)
     t, x = FSKMod(mb)
 
     playSound(x)
     # Espera o som acabar para continuar o script
     sd.wait()
 
-    wavfile.write('hello.wav', 44100, np.int32((2**31 - 1) * x))
-
-    ## Plotting Data ##
-    ax_bit = plt.subplot(211)
-    ax_bit.plot(t, mb)
-    ax_bit.set_ylabel('Mensagem binária')
-    ax_bit.grid(True)
-
-    ax_mod = plt.subplot(212)
-    ax_mod.plot(t, x)
-    ax_mod.set_ylabel('Mensagem modulada')
-    ax_mod.set_xlabel('Tempo (s)')
-    ax_mod.grid(True)
-
-    plt.show()
+    
+#    wavfile.write('hello.wav', 44100, np.int32((2**31 - 1) * x))
+#
+#    ## Plotting Data ##
+#    ax_bit = plt.subplot(211)
+#    ax_bit.plot(t, mb)
+#    ax_bit.set_ylabel('Mensagem binária')
+#    ax_bit.grid(True)
+#
+#    ax_mod = plt.subplot(212)
+#    ax_mod.plot(t, x)
+#    ax_mod.set_ylabel('Mensagem modulada')
+#    ax_mod.set_xlabel('Tempo (s)')
+#    ax_mod.grid(True)
+#
+#    plt.show()

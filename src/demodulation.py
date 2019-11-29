@@ -75,7 +75,7 @@ def bitwaveSample(bitwave, Fs=44100, baud=10):
     return bits
 
 
-def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM', Fs=44100, baud=10):
+def sincronizeBits(bits, INIT_STREAM='2wLQTcNgiXyP<{', END_STREAM='}>ggIVZMbi09VM', Fs=44100, baud=10, verbose=True):
     sync_init = stringToBits(INIT_STREAM)
     sync_end = stringToBits(END_STREAM)
     c_init = np.correlate(bits, sync_init)
@@ -100,13 +100,21 @@ def bitErrorRate(original_bits: np.array, received_bits: np.array):
 
 if __name__ == '__main__':
     fs = 44100
-    audio = getAudio(duration=200)[:,0]
+    audio = getAudio(duration=30)[:,0]
+    print(audio)
+    print(audio.shape)
     audio = np.float64(audio/(2**31 - 1))
     bitwave = FSKdemod(audio, Fs=fs, verbose=True)
-    bits = bitwaveSample(bitwave)
+    bits = bitwaveSample(bitwave,baud=25)
     bits = sincronizeBits(bits, verbose=True)
-    print(bitsToString(bits))
+    try:
+        print(bitErrorRate(stringToBits("LJlqRK0sLItJH3dzgpoYb0g79fXs7u2dr67lxY2GYhTiiwyH7y"), bits))
+        print(bits)
+        print("LJlqRK0sLItJH3dzgpoYb0g79fXs7u2dr67lxY2GYhTiiwyH7y")
+    except:
+        print("nao leu")
     plt.figure()
     plt.plot(bitwave)
     plt.xlim(420000, 470000)
     plt.show()
+
